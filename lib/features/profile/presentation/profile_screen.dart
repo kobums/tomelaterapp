@@ -115,7 +115,31 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(height: 60),
+              const SizedBox(height: 40),
+
+              // Privacy Policy
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                onTap: () {
+                  context.go('/profile/privacy-policy');
+                },
+                title: const Text(
+                  'Privacy Policy',
+                  style: TextStyle(
+                    fontFamily: 'Pretendard',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF374151),
+                  ),
+                ),
+                trailing: Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 16,
+                  color: Colors.grey.shade400,
+                ),
+              ),
+
+              const SizedBox(height: 20),
 
               // Logout Button (Minimalist Red Outline)
               OutlinedButton(

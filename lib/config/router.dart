@@ -5,6 +5,7 @@ import 'package:app/features/auth/presentation/register_screen.dart';
 import 'package:app/features/history/presentation/history_detail_screen.dart';
 import 'package:app/features/history/presentation/history_screen.dart';
 import 'package:app/features/profile/presentation/profile_screen.dart';
+import 'package:app/features/profile/presentation/privacy_policy_screen.dart';
 import 'package:app/features/question/presentation/question_screen.dart';
 import 'package:app/shared/models/answer.dart';
 import 'package:app/shared/scaffold_with_nav.dart';
@@ -75,6 +76,13 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/profile',
+                routes: [
+                  GoRoute(
+                    path: 'privacy-policy',
+                    parentNavigatorKey: rootNavigatorKey,
+                    builder: (context, state) => const PrivacyPolicyScreen(),
+                  ),
+                ],
                 builder: (context, state) => const ProfileScreen(),
               ),
             ],
