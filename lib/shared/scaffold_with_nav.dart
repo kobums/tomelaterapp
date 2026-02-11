@@ -19,11 +19,11 @@ class ScaffoldWithNavBar extends StatelessWidget {
           // Main Content
           navigationShell,
 
-          // Fixed Liquid Glass Navigation Bar (Non-floating)
+          // Floating Pill Navigation Bar
           Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
+            left: 24,
+            right: 24,
+            bottom: 34,
             child: _LiquidGlassNavBar(
               currentIndex: navigationShell.currentIndex,
               onTap: (index) => _onTap(context, index),
@@ -54,56 +54,53 @@ class _LiquidGlassNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      borderRadius: BorderRadius.circular(30),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
-          height: 96, // Increased height to prevent overflow (was 90)
-          padding: const EdgeInsets.fromLTRB(0, 10, 0, 25), // Padding for visual balance and home indicator
+          height: 64,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.75), // Slightly more opaque for readability
-            border: Border(
-              top: BorderSide(
-                color: Colors.white.withOpacity(0.6),
-                width: 1.0,
-              ),
+            color: Colors.white.withOpacity(0.8),
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.2),
+              width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, -2), // Shadow upwards
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+                spreadRadius: 2,
               ),
             ],
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
               colors: [
-                Colors.white.withOpacity(0.8),
-                Colors.white.withOpacity(0.5),
+                Colors.white.withOpacity(0.9),
+                Colors.white.withOpacity(0.6),
               ],
             ),
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               _NavBarItem(
                 icon: Icons.edit_note_rounded,
-                label: '질문',
                 isSelected: currentIndex == 0,
                 onTap: () => onTap(0),
               ),
               _NavBarItem(
                 icon: Icons.history_rounded,
-                label: '기록',
                 isSelected: currentIndex == 1,
                 onTap: () => onTap(1),
               ),
               _NavBarItem(
                 icon: Icons.person_outline_rounded,
                 selectedIcon: Icons.person_rounded,
-                label: '프로필',
                 isSelected: currentIndex == 2,
                 onTap: () => onTap(2),
               ),
@@ -118,14 +115,12 @@ class _LiquidGlassNavBar extends StatelessWidget {
 class _NavBarItem extends StatelessWidget {
   final IconData icon;
   final IconData? selectedIcon;
-  final String label;
   final bool isSelected;
   final VoidCallback onTap;
 
   const _NavBarItem({
     required this.icon,
     this.selectedIcon,
-    required this.label,
     required this.isSelected,
     required this.onTap,
   });
@@ -137,34 +132,31 @@ class _NavBarItem extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
         height: double.infinity,
-        width: 80, 
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.all(6), // Reduced padding (was 8)
-              decoration: BoxDecoration(
-                color: isSelected ? Colors.indigo.withOpacity(0.1) : Colors.transparent,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                isSelected ? (selectedIcon ?? icon) : icon,
-                color: isSelected ? Colors.indigo : Colors.grey.shade500,
-                size: 24, // Slightly smaller icon (was 26)
-              ),
+        width: 60,
+        child: Center(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            padding: EdgeInsets.all(isSelected ? 10 : 8),
+            decoration: BoxDecoration(
+              color: isSelected ? Colors.indigo : Colors.transparent,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: Colors.indigo.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      )
+                    ]
+                  : [],
             ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10, // Slightly smaller font (was 11)
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? Colors.indigo : Colors.grey.shade600,
-                fontFamily: 'Pretendard',
-              ),
+            child: Icon(
+              isSelected ? (selectedIcon ?? icon) : icon,
+              color: isSelected ? Colors.white : Colors.grey.shade400,
+              size: 24,
             ),
-          ],
+          ),
         ),
       ),
     );
