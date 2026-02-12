@@ -5,10 +5,29 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+import java.util.Properties
+import java.io.FileInputStream
+
+
 android {
     namespace = "com.tomelater.app"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
+
+    signingConfigs {
+        create("release") {
+            val keyPropertiesFile = rootProject.file("key.properties")
+            val keyProperties = Properties()
+            if (keyPropertiesFile.exists()) {
+                keyProperties.load(FileInputStream(keyPropertiesFile))
+            }
+
+            storeFile = file(keyProperties.getProperty("storeFile") ?: "/Users/gowoobro/upload-keystore.jks")
+            storePassword = keyProperties.getProperty("storePassword") ?: "your_store_password"
+            keyAlias = keyProperties.getProperty("keyAlias") ?: "upload"
+            keyPassword = keyProperties.getProperty("keyPassword") ?: "your_key_password"
+        }
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -16,7 +35,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        jvmTarget = "17"
     }
 
     defaultConfig {
@@ -34,7 +53,7 @@ android {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
