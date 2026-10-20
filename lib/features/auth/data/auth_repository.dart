@@ -10,9 +10,11 @@ class AuthRepository {
 
   Future<LoginResponse> login(String email, String password) async {
     try {
-      final response = await _dio.get(
-        '/api/jwt',
-        queryParameters: {'email': email, 'passwd': password},
+      // 비밀번호를 URL 쿼리스트링(GET /api/jwt)에 싣지 않고 JSON 본문으로 보낸다.
+      // (GET /api/jwt 는 구버전 앱 호환용으로만 서버에 남아 있다.)
+      final response = await _dio.post(
+        '/api/auth/login',
+        data: {'email': email, 'passwd': password},
       );
       return LoginResponse.fromJson(response.data);
     } on DioException catch (e) {
