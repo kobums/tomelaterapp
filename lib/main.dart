@@ -1,4 +1,5 @@
 import 'package:app/config/router.dart';
+import 'package:app/core/network/api_client.dart';
 import 'package:app/core/storage/storage_service.dart';
 import 'package:app/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,10 @@ void main() async {
     ProviderScope(
       overrides: [
         storageServiceProvider.overrideWithValue(StorageService(prefs)),
+        // 401(토큰 만료) → 로그인 화면. 토큰은 api_client 인터셉터가 이미 지웠다.
+        unauthorizedHandlerProvider.overrideWith(
+          (ref) => () => ref.read(routerProvider).go('/login'),
+        ),
       ],
       child: const MyApp(),
     ),
