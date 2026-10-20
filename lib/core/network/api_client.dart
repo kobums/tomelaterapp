@@ -16,6 +16,14 @@ Object? _redact(Object? data) {
   return data;
 }
 
+// 401(토큰 만료·무효) 수신 시 호출할 콜백. main.dart 에서 로그인 화면 이동으로 덮어쓴다.
+// (router.dart 는 화면들을 import 하므로 여기서 직접 참조하지 않는다.)
+final unauthorizedHandlerProvider = Provider<void Function()>((ref) => () {});
+
+// 로그인·가입·계정찾기 요청의 401 은 "자격 증명 오류"이지 세션 만료가 아니다.
+bool _isAuthRequest(String path) =>
+    path.startsWith('/api/auth/') || path.startsWith('/api/jwt');
+
 final dioProvider = Provider<Dio>((ref) {
   final storageService = ref.watch(storageServiceProvider);
 
@@ -49,10 +57,20 @@ final dioProvider = Provider<Dio>((ref) {
         }
         return handler.next(response);
       },
-      onError: (DioException e, handler) {
+      onError: (DioException e, handler) async {
         if (kDebugMode) {
           print('ERROR[${e.response?.statusCode}] => PATH: ${e.requestOptions.path}');
           print('MESSAGE: ${e.message}');
+        }
+        // 토큰을 실어 보낸 요청이 401 이면 토큰이 만료/무효다. 저장된 로그인 정보를 지우고
+        // 로그인 화면으로 보낸다(서버는 리프레시 토큰이 없어 재로그인만 가능).
+        // 동시에 여러 요청이 401 을 받아도 토큰이 남아 있을 때 한 번만 처리한다.
+        if (e.response?.statusCode == 401 &&
+            !_isAuthRequest(e.requestOptions.path) &&
+            e.requestOptions.headers['Authorization'] != null &&
+            storageService.getToken() != null) {
+          await storageService.clearAll();
+          ref.read(unauthorizedHandlerProvider)();
         }
         return handler.next(e);
       },
