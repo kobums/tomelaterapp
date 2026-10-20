@@ -7,6 +7,15 @@ import '../storage/storage_service.dart';
 // final String kBaseUrl = Platform.isAndroid ? 'http://10.0.2.2:8006' : 'http://localhost:8006';
 final String kBaseUrl = 'https://tomelaterspring.gowoobro.com';
 
+// 디버그 로그에 비밀번호가 찍히지 않도록 가린다.
+Object? _redact(Object? data) {
+  if (data is Map) {
+    return data.map((k, v) =>
+        MapEntry(k, k == 'passwd' || k == 'newPasswd' ? '***' : v));
+  }
+  return data;
+}
+
 final dioProvider = Provider<Dio>((ref) {
   final storageService = ref.watch(storageServiceProvider);
 
@@ -29,7 +38,7 @@ final dioProvider = Provider<Dio>((ref) {
         
         if (kDebugMode) {
           print('REQUEST[${options.method}] => PATH: ${options.path}');
-          print('DATA: ${options.data}');
+          print('DATA: ${_redact(options.data)}');
         }
         return handler.next(options);
       },
