@@ -1,11 +1,49 @@
 import 'package:app/core/storage/storage_service.dart';
 import 'package:app/features/auth/presentation/auth_view_model.dart';
+import 'package:app/util/legal_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
+
+  Future<void> _confirmWithdraw(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('회원 탈퇴'),
+        content: const Text(
+          '탈퇴하면 계정과 작성한 모든 답변이 영구적으로 삭제되며 복구할 수 없습니다. 정말 탈퇴하시겠습니까?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('탈퇴하기'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    try {
+      await ref.read(authViewModelProvider.notifier).withdraw();
+      if (context.mounted) {
+        context.go('/login');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -117,12 +155,30 @@ class ProfileScreen extends ConsumerWidget {
 
               const SizedBox(height: 40),
 
+              // Terms of Service
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                onTap: () => openLegalUrl(context, kTermsUrl),
+                title: const Text(
+                  'Terms of Service',
+                  style: TextStyle(
+                    fontFamily: 'Pretendard',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF374151),
+                  ),
+                ),
+                trailing: Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 16,
+                  color: Colors.grey.shade400,
+                ),
+              ),
+
               // Privacy Policy
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                onTap: () {
-                  context.go('/profile/privacy-policy');
-                },
+                onTap: () => openLegalUrl(context, kPrivacyUrl),
                 title: const Text(
                   'Privacy Policy',
                   style: TextStyle(
@@ -180,7 +236,24 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 12),
+
+              // Delete Account (회원 탈퇴)
+              TextButton(
+                onPressed: () => _confirmWithdraw(context, ref),
+                child: Text(
+                  'Delete Account',
+                  style: TextStyle(
+                    fontFamily: 'Pretendard',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey.shade500,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 28),
 
               // Version
               Text(

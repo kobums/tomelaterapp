@@ -1,4 +1,5 @@
 import 'package:app/features/auth/presentation/register_view_model.dart';
+import 'package:app/util/legal_links.dart';
 import 'package:app/util/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -197,6 +198,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                       )
                     : const Text('회원가입'),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                alignment: WrapAlignment.center,
+                children: [
+                  const Text('가입하면 ', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  GestureDetector(
+                    onTap: () => openLegalUrl(context, kTermsUrl),
+                    child: const Text(
+                      '이용약관',
+                      style: TextStyle(fontSize: 12, decoration: TextDecoration.underline),
+                    ),
+                  ),
+                  const Text(' 및 ', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  GestureDetector(
+                    onTap: () => openLegalUrl(context, kPrivacyUrl),
+                    child: const Text(
+                      '개인정보 처리방침',
+                      style: TextStyle(fontSize: 12, decoration: TextDecoration.underline),
+                    ),
+                  ),
+                  const Text('에 동의하는 것으로 간주됩니다.', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                ],
               ),
 
             ],
