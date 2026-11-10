@@ -30,6 +30,17 @@ class AuthViewModel extends StateNotifier<AsyncValue<void>> {
     }
   }
 
+  // 회원 탈퇴: 서버에서 계정·답변을 삭제한 뒤 저장된 로그인 정보를 지운다.
+  // 실패하면 예외를 던지고 로그인 상태는 그대로 둔다.
+  Future<void> withdraw() async {
+    final id = _storageService.getUserId();
+    if (id == null) {
+      throw Exception('로그인 정보를 찾을 수 없습니다. 다시 로그인해주세요.');
+    }
+    await _authRepository.deleteAccount(id);
+    await _storageService.clearAll();
+  }
+
   Future<void> logout() async {
     await _storageService.clearAll();
     // Router redirect will handle navigation

@@ -56,6 +56,19 @@ class AuthRepository {
     }
   }
 
+  // 회원 탈퇴: DELETE /api/user/:id (본인만 가능). 서버가 계정과 모든 답변을 삭제한다.
+  Future<void> deleteAccount(int id) async {
+    try {
+      final response = await _dio.delete('/api/user/$id');
+      final data = response.data;
+      if (data is! Map || data['success'] != true) {
+        throw Exception('회원 탈퇴에 실패했습니다.');
+      }
+    } catch (e) {
+      throw Exception('회원 탈퇴에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    }
+  }
+
   Future<String> findEmail(String nickname) async {
     try {
       final response = await _dio.post(
